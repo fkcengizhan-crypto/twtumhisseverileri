@@ -1,0 +1,18 @@
+# Windows'ta düzenlenip Linux runner'da çalışan dosyalar için satır sonunu
+# sabit tut. Bu olmadan CRLF/LF karışıklığı yamalarda gereksiz değişiklik
+# gösterir.
+* text=auto
+
+*.py    text eol=lf
+*.md    text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.gs    text eol=lf
+*.txt   text eol=lf
+*.csv   text eol=lf
+.gitignore     text eol=lf
+.gitattributes text eol=lf
+
+# Ikili dosyalar
+*.xlsx  binary
+*.json  -text

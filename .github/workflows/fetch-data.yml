@@ -1,0 +1,71 @@
+name: Günlük BIST Verisi
+
+# Google Apps Script bu işi tetikler (repository_dispatch).
+# Saat seçimi Google Script panelinde yapılır; burada sabit zaman yok.
+# Elle tetiklemek için: Actions sekmesinden "Run workflow".
+on:
+  repository_dispatch:
+    types: [veri-cek]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Aynı anda iki tetikleme gelirse (ör. saat 19:00 ve 19:05) ikincisi
+# bekler, ilk bitince sırayla çalışır; veri çakışmaz.
+concurrency:
+  group: bist-veri
+  cancel-in-progress: false
+
+jobs:
+  veri:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Kodu çek
+        uses: actions/checkout@v4
+
+      - name: Python kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Bağımlılıkları kur
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Sütun kataloğu ilk çalıştırmada ~2 dk keşfediliyor.
+      # Önbellek sayesinde sonrakiler ~20 sn'de bitiyor.
+      - name: Sütun önbelleğini geri yükle
+        uses: actions/cache@v4
+        with:
+          path: ~/.tradingview_screener
+          key: sutun-katalogu-${{ github.run_number }}
+          restore-keys: sutun-katalogu-
+
+      - name: Veriyi çek
+        run: python tradingview_screener.py
+
+      - name: Üretilen dosyalar
+        run: |
+          echo "### Archive içeriği"
+          ls -lh Archive/
+
+      - name: Tarihli Excel'i depoya kaydet
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Archive/
+          git status --short
+
+          if git diff --cached --quiet; then
+            echo "Yeni dosya yok, commit atlandı."
+            exit 0
+          fi
+
+          TARIH=$(date -u +%Y-%m-%d)
+          git commit -m "veri: ${TARIH} ($(ls Archive/BIST_*.xlsx 2>/dev/null | wc -l) dosya)"
+          git push
+          echo "Depoya gönderildi."

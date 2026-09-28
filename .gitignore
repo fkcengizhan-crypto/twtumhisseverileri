@@ -1,0 +1,27 @@
+# ------------------------------------------------------------------
+# Gunluk veri ciktisi
+# ------------------------------------------------------------------
+# Depoya yalnizca tarihli Excel dosyalari girer (BIST_20260928.xlsx gibi).
+# Gunluk 5,4 MB -> ayda ~160 MB.
+Archive/*_2.xlsx
+Archive/*_3.xlsx
+Archive/*_4.xlsx
+Archive/Bist_Hisse_Tum_Veriler.xlsx
+Archive/Bist_Hisse_Tum_Veriler.json
+
+# ------------------------------------------------------------------
+# Python
+# ------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# ------------------------------------------------------------------
+# Onbellek ve gecici dosyalar
+# ------------------------------------------------------------------
+.tradingview_screener/
+sutun_katalogu.json
+sutun_katalogu.csv
+Thumbs.db
+.DS_Store
